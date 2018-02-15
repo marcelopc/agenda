@@ -5,11 +5,13 @@
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 
 
 <link rel="import" href="../my-components/site-submitbutton/site-submitbutton.html">
 <link rel="import" href="../my-components/site-preloader/site-preloader.html">
 <link rel="import" href="../my-components/site-background/site-background.html">
+<link rel="import" href="../my-components/status-connection/status-connection.html">
 
 <link rel="import" href="shared-styles.html">
 
@@ -43,8 +45,16 @@
             float: right;
             margin-right: 10px;
        }
+       .disabled{
+           background-color: #ccc;
+       }
+       .textsize{
+           font-size: 0.9em;
+       }
 
     </style>
+    <status-connection url="[[urlserverconnection]]" status="{{status}}"></status-connection>
+
     <site-background image='../../images/background/agenda.jpg'></site-background>
     <paper-icon-button icon="settings" onclick="toHash('/configuracaoServidor', 'left')"></paper-icon-button>
 
@@ -54,11 +64,12 @@
             <paper-input id='email' label="E-mail" value={{user}} required></paper-input>
             <paper-input id='password' type="password" label="Senha" value={{password}} on-keypress="_keypressLogin"required></paper-input>
             <div class="error">[[error]]</div>
-            <input type="submit" value="Entrar" class="submit center">
+            <input type="submit" value="Entrar" class="submit center" id="submit">
         </form>
     </paper-card>
 
 
+    <paper-toast duration="3000" class="textsize" id="toast" text="{{textToast}}" on-click="_verifyConnection"></paper-toast>
 
     <site-preloader active=[[loading]]></site-preloader>
 
@@ -92,6 +103,17 @@
               },
               urlserver: {
                   type: String
+              },
+              urlserverconnection: {
+                  type: String
+              },
+              status: {
+                  type: Boolean,
+                  value: false,
+                  observer: "_statusObserver"
+              },
+              textToast: {
+                  type: String
               }
           }
       }
@@ -99,9 +121,28 @@
           super.ready();
 
           if(localStorage.getItem("server")){
+              this.urlserverconnection = localStorage.getItem("server") + "/status";
               this.urlserver = localStorage.getItem("server") + "/authenticate";
           }
 
+      }
+
+      _statusObserver(){
+          if(this.status !== undefined){
+              if(this.status){
+                  this.$.submit.classList.remove('disabled');
+                  this.$.submit.disabled = false;
+              }else{
+                  this._openToast("Servidor Offline!");
+                  this.$.submit.classList.add('disabled');
+                  this.$.submit.disabled = true;
+              }
+          }
+      }
+
+      _openToast(message){
+          this.textToast = message;
+          this.$.toast.open();
       }
 
       _keypressLogin(event){
