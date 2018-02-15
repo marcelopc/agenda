@@ -1,0 +1,81 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="status-connection">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <iron-ajax
+        auto
+        id="ajax"
+        loading="{{loading}}"
+        url="[[url]]"
+        method="[[method]]"
+        timeout="10000"
+        on-response="_onResponse"
+        on-error="_onError"></iron-ajax>
+  </template>
+
+  <script>
+    class StatusConnection extends Polymer.Element {
+      static get is() { return 'status-connection'; }
+      static get properties() {
+          return {
+              url: {
+                  type:String
+              },
+              status: {
+                  type: Boolean,
+                  notify: true
+              },
+              method:{
+                  type: String,
+                  value: "HEAD"
+              },
+              loading:{
+                  type: Boolean,
+                  notify: true
+              },
+              default:{
+                  type: String
+              }
+          }
+      }
+      ready(){
+          super.ready();
+          this._parsePropertieDefault();
+          this.status = this.default;
+
+          if(this.url === "" || this.url === null || this.url === undefined){
+              this.status = undefined;
+          }
+      }
+
+      _parsePropertieDefault(){
+          switch(this.default) {
+              case "true":
+                  this.default = true;
+                  break;
+              case "false":
+                  this.default = false;
+                  break;
+              default:
+                  this.default = undefined;
+          }
+      }
+
+      _onResponse(){
+          this.status = true;
+      }
+      _onError(){
+          this.status = false;
+      }
+    }
+
+    window.customElements.define(StatusConnection.is, StatusConnection);
+  </script>
+</dom-module>

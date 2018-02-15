@@ -1,0 +1,145 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/app-layout/app-layout.html">
+
+<link rel="import" href="../my-components/status-connection/status-connection.html">
+
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="agenda-cfgserver">
+  <template>
+    <style include="shared-styles">
+
+      :host {
+        display: block;
+      }
+
+      paper-card{
+          background-color: #FFF;
+          margin-top: 100px;
+          position: relative;
+          width: 370px;
+          border: 8px solid #FFF;
+          padding: 20px;
+          border-radius: 10px;
+          box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+      }
+        .btnEnviar{
+            margin-top: 5px;
+            background-color: var(--back-btn, #000);
+            color:var(--text-btn, #000)
+        }
+        .status-connection{
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 170px;
+            border-radius: 10px;
+            box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+            text-align: center;
+            color: #FFF
+        }
+        .on{
+            background-color: #8bc34a;
+            border: 8px solid #8bc34a;
+        }
+        .off{
+            background-color: #ea1c1c;
+            border: 8px solid #ea1c1c;
+        }
+
+
+    </style>
+    <status-connection url="[[urlserver]]" status="{{status}}"></status-connection>
+
+    <app-header fixed class="app-header">
+        <paper-icon-button class="arrowBack" icon="arrow-back" onclick="toHash('/', 'right')"></paper-icon-button>
+        <span class="spantitle">Configuração do Servidor</span>
+    </app-header>
+
+    <iron-form>
+        <form id="form" on-submit="_saveServer">
+            <paper-card class="center">
+
+                <div class="card-content">
+                    <paper-input id="inputServer" label="Dominio do Servidor"
+                     pattern="^(http(s)?:\/\/)(([a-z0-9-_]+)(\.))+([a-z]{2,3})$|^(http(s)?:\/\/)(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(:(\d{1,5}))?$"
+                     required auto-validate type="text"></paper-input>
+
+                     <div id='divconnection' class="status-connection">
+                         <template is="dom-if" if="{{status}}">
+                             <span>conectado</span>
+                         </template>
+                         <template is="dom-if" if="{{!status}}">
+                             <span>Desconectado</span>
+                         </template>
+                     </div>
+
+                </div>
+                <div class="card-actions">
+                    <input type="submit" class="submit center" value="Enviar">
+                </div>
+                </paper-card>
+            </form>
+        </iron-form>
+
+
+  </template>
+
+  <script>
+    class AgendaCfgserver extends Polymer.Element {
+      static get is() { return 'agenda-cfgserver'; }
+      static get properties() {
+          return {
+                status: {
+                    type: Boolean,
+                    observer: "_onoff"
+                },
+                urlserver:{
+                    type: String
+                }
+          }
+      }
+
+     ready(){
+         super.ready();
+
+         if(localStorage.getItem("server")){
+             this.urlserver = localStorage.getItem("server") + "/status"
+             this.$.inputServer.value = localStorage.getItem("server");
+         }
+
+     }
+
+     _onoff(){
+         if(this.status !== undefined){
+             if(this.status){
+                 this.$.divconnection.classList.remove("off");
+                this.$.divconnection.classList.add("on");
+             }else{
+                 this.$.divconnection.classList.remove("on");
+                 this.$.divconnection.classList.add("off");
+             }
+         }
+     }
+
+     _saveServer(event){
+         if(this.$.inputServer.validate()){
+             localStorage.setItem("server", this.$.inputServer.value);
+             this.urlserver = null;
+             this.urlserver = this.$.inputServer.value + "/status";
+
+             event.preventDefault();
+         }
+     }
+
+    }
+
+    window.customElements.define(AgendaCfgserver.is, AgendaCfgserver);
+  </script>
+</dom-module>

@@ -1,0 +1,144 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+
+
+<link rel="import" href="../my-components/site-submitbutton/site-submitbutton.html">
+<link rel="import" href="../my-components/site-preloader/site-preloader.html">
+<link rel="import" href="../my-components/site-background/site-background.html">
+
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="agenda-login">
+  <template>
+    <style include="shared-styles">
+    :host {
+        display: block;
+        width: 100%;
+        height: 100vh;
+    }
+
+    paper-card{
+        background-color: #FFF;
+        margin-top: 100px;
+        position: relative;
+        width: 270px;
+        border: 8px solid #FFF;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+    }
+
+    .error {
+           color: #e82e2e;
+           text-align: center;
+           margin-bottom: 2px;
+       }
+       paper-icon-button{
+            position: relative;
+            float: right;
+            margin-right: 10px;
+       }
+
+    </style>
+    <site-background image='../../images/background/agenda.jpg'></site-background>
+    <paper-icon-button icon="settings" onclick="toHash('/configuracaoServidor', 'left')"></paper-icon-button>
+
+
+    <paper-card class="center" elevation="1">
+        <form on-submit="_login">
+            <paper-input id='email' label="E-mail" value={{user}} required></paper-input>
+            <paper-input id='password' type="password" label="Senha" value={{password}} on-keypress="_keypressLogin"required></paper-input>
+            <div class="error">[[error]]</div>
+            <input type="submit" value="Entrar" class="submit center">
+        </form>
+    </paper-card>
+
+
+
+    <site-preloader active=[[loading]]></site-preloader>
+
+    <iron-ajax
+      id='loginAjax'
+      url="{{urlserver}}"
+      handle-as="json"
+      on-response="_response"
+      on-error='_responseErrorLogin'
+      method="POST"
+      content-type="application/json"
+      loading={{loading}}
+      >
+     </iron-ajax>
+  </template>
+
+  <script>
+    class AgendaLogin extends Polymer.Element {
+      static get is() { return 'agenda-login'; }
+
+      static get properties() {
+          return {
+              user: {
+                  type: String
+              },
+              password: {
+                  type: String
+              },
+              error: {
+                  type: String
+              },
+              urlserver: {
+                  type: String
+              }
+          }
+      }
+      ready() {
+          super.ready();
+
+          if(localStorage.getItem("server")){
+              this.urlserver = localStorage.getItem("server") + "/authenticate";
+          }
+
+      }
+
+      _keypressLogin(event){
+        if (event.keyCode === 13) {
+          this._login(event);
+        }
+      }
+
+      _login(event) {
+          event.preventDefault();
+          if(this.user && this.password){
+              this.$.loginAjax.body = {
+                  email: this.user,
+                  password: this.password
+              };
+              this.$.loginAjax.generateRequest();
+
+          }else{
+              this.error = "Digite o email e a senha."
+              setTimeout(()=>{this.error = undefined;},3000)
+
+          }
+
+      }
+
+      _response(e, request){
+          localStorage.setItem("token", this.$.loginAjax.lastResponse.token);
+          localStorage.setItem("usuario", this.user);
+      }
+
+      _responseErrorLogin(){
+          this.error = this.$.loginAjax.lastError.response.message;
+          setTimeout(()=>{this.error = undefined;},3000)
+      }
+
+    }
+
+    window.customElements.define(AgendaLogin.is, AgendaLogin);
+  </script>
+</dom-module>

@@ -1,0 +1,72 @@
+<!-- Load the Polymer.Element base class -->
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="site-submitbutton">
+
+    <template>
+    <style>
+      :host {
+        display: block;
+      }
+      input{
+          -webkit-appearance: none;
+          width: 30%;
+          height: 35px;
+          border: 0px;
+          font-size: 1em;
+          outline: 0;
+          position: relative;
+          color: #FFF;
+          background-color: #337ab7;
+          border-color: #2e6da4;
+          border-radius: 10%;
+          cursor: pointer;
+      }
+      input:hover{
+        background-color: #286090;
+        border-color: #204d74;
+      }
+      input:active{
+        background-color: #204d74;
+        border-color: #122b40;
+      }
+    </style>
+
+    <input id='btn' type="submit" value="[[name]]" disabled="{{disabled}}">
+
+  </template>
+    <script>
+        class SiteSubmitButton extends Polymer.Element {
+            static get is() {
+                return 'site-submitbutton';
+            }
+            static get properties() {
+                return {
+                    name: {
+                        type: String,
+                        value: 'Enviar'
+                    },
+                    disabled: {
+                        type: Boolean
+                    },
+                    center: {
+                        type: Boolean
+                    }
+                }
+            }
+            ready() {
+                super.ready();
+
+                if (this.center) {
+                    this._centerBtn();
+                }
+            }
+            _centerBtn() {
+                this.$.btn.style.left = '50%';
+                this.$.btn.style.transform = 'translateX(-50%)';
+            }
+        }
+
+        customElements.define(SiteSubmitButton.is, SiteSubmitButton);
+    </script>
+</dom-module>

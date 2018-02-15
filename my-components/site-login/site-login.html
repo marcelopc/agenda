@@ -1,0 +1,120 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../my-components/site-submitbutton/site-submitbutton.html">
+<link rel="import" href="../../my-components/site-preloader/site-preloader.html">
+<link rel="import" href="../../my-components/site-background/site-background.html">
+
+
+<dom-module id="site-login">
+    <template>
+    <style>
+      :host {
+          --primary-color: #3f51b5;
+        display: block;
+      }
+      .center{
+          position: relative;
+          left: 50%;
+          transform: translateX(-50%);
+      }
+      .content-box{
+          background-color: #FFF;
+          margin-top: 100px;
+          position: relative;
+          width: 270px;
+          border: 8px solid #FFF;
+          padding: 20px;
+          border-radius: 10px;
+          box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+      }
+      .content-box > .indigo {
+         background-color: var(--primary-color);
+         color: white;
+         }
+      .error {
+             color: #e82e2e;
+             text-align: center;
+            margin-bottom: 2px;
+         }
+
+    </style>
+    <site-background image='../../images/background/agenda.jpg'></site-background>
+
+    <div class="content-box center">
+
+          <form on-submit="_login">
+              <paper-input id='email' label="E-mail" value={{user}}></paper-input>
+              <paper-input id='password' type="password" label="Senha" value={{password}}></paper-input>
+              <div class="error">[[error]]</div>
+              <site-submitbutton center on-click="_login"></site-submitbutton>
+          </form>
+    </div>
+
+    <site-preloader active=[[loading]]></site-preloader>
+
+    <iron-ajax
+      id='loginAjax'
+      url="http://localhost:3000/authenticate"
+      handle-as="json"
+      on-response="_response"
+      on-error='_responseErrorLogin'
+      method="POST"
+      content-type="application/json"
+      loading={{loading}}
+      >
+     </iron-ajax>
+  </template>
+    <script>
+        class SiteLogin extends Polymer.Element {
+            static get is() {
+                return "site-login";
+            }
+            static get properties() {
+                return {
+                    user: {
+                        type: String
+                    },
+                    password: {
+                        type: String
+                    },
+                    error: {
+                        type: String
+                    }
+                }
+            }
+            ready() {
+                super.ready();
+            }
+
+            _login() {
+                if(this.user && this.password){
+                    this.$.loginAjax.body = {
+                        email: this.user,
+                        password: this.password
+                    };
+                    this.$.loginAjax.generateRequest();
+
+                }else{
+                    this.error = "Digite o email e a senha."
+                    setTimeout(()=>{this.error = undefined;},3000)
+
+                }
+
+            }
+
+            _response(e, request){
+                localStorage.setItem("token", this.$.loginAjax.lastResponse.token);
+                localStorage.setItem("usuario", this.user);
+            }
+
+            _responseErrorLogin(){
+                this.error = this.$.loginAjax.lastError.response.message;
+                setTimeout(()=>{this.error = undefined;},3000)
+            }
+        }
+
+        customElements.define(SiteLogin.is, SiteLogin);
+    </script>
+</dom-module>

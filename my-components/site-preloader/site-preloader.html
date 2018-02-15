@@ -1,0 +1,59 @@
+<!-- Load the Polymer.Element base class -->
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+
+<dom-module id="site-preloader">
+
+    <template>
+    <style>
+      :host {
+        display: block;
+      }
+    .modal{
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.6);
+    }
+    .content{
+        background-color: #FFF;
+        position: absolute;
+        top: 20%;
+        left: 50%;
+        transform: translateX(-50%);
+        box-shadow: 0 5px 8px 0 rgba(0,0,0,0.2),0 7px 20px 0 rgba(0,0,0,0.2);
+        width: 90px;
+    }
+    img{
+        width: 100%;
+    }
+    </style>
+
+    <div class="modal" hidden={{!active}}>
+        <div class="content">
+            <img src="./images/preloader/preloader.gif">
+        </div>
+    </div>
+
+  </template>
+    <script>
+        class SitePreloader extends Polymer.Element {
+            static get is() {
+                return 'site-preloader';
+            }
+            static get properties() {
+                return {
+                    active: {
+                        type: Boolean,
+                        value: false
+                    }
+                }
+            }
+        }
+
+        customElements.define(SitePreloader.is, SitePreloader);
+    </script>
+</dom-module>

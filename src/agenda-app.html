@@ -1,0 +1,65 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/dna-router/dna.html">
+
+
+
+<link rel="import" href="agenda-login.html">
+<link rel="import" href="agenda-cfgserver.html">
+<link rel="import" href="my-view3.html">
+
+
+
+<dom-module id="agenda-app">
+  <template>
+    <style>
+      :host {
+        display: block;
+        height: 100%;
+
+        --bar-color: #0953cd;
+        --bar-text-color: #FFF;
+
+        --back-btn: #0953cd;
+        --text-btn: #FFF;
+      }
+     </style>
+
+     <dna-state state='home' route='/'></dna-state>
+     <dna-state state='configuracaoServidor' route='/configuracaoServidor'></dna-state>
+     <dna-state state='tela3' route='/tela3'></dna-state>
+
+
+     <dna-config
+       id='config'
+       home='home'
+       template='src'> </dna-config>
+
+     <dna-view
+      state='home'
+      element='agenda-login'></dna-view>
+    <dna-view
+      state='configuracaoServidor'
+      element='agenda-cfgserver'></dna-view>
+    <dna-view
+      state='tela3'
+      element='my-view3'></dna-view>
+
+
+
+
+
+
+  </template>
+
+  <script>
+
+      class AgendaApp extends Polymer.Element {
+      static get is() { return 'agenda-app'; }
+
+    }
+
+    window.customElements.define(AgendaApp.is, AgendaApp);
+  </script>
+</dom-module>
